@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>디벗 테크니션 역량 진단 · 50문항</title>
+<style>
+:root{
+  --bg:#0b1020; --bg2:#0e1528; --card:#131c33; --card2:#16203a; --line:#22304f;
+  --fg:#e8eefc; --muted:#8fa3c8; --dim:#5f7296;
+  --blue:#2f6bff; --blue2:#1ea7ff; --cyan:#31d3f2; --ok:#22c55e; --warn:#f5b301; --bad:#f2542d;
+  --r:14px;
+  --font: Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", "Malgun Gothic", sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:radial-gradient(1200px 600px at 20% -10%, #16233f 0%, var(--bg) 55%) fixed, var(--bg);
+     color:var(--fg); font-family:var(--font); font-size:14px; line-height:1.5; -webkit-font-smoothing:antialiased;}
+a{color:var(--blue2)}
+.app{display:flex; min-height:100vh}
+
+/* ---------- Sidebar ---------- */
+.side{width:230px; flex:0 0 230px; background:#0a0f1e; border-right:1px solid var(--line); padding:18px 14px; position:sticky; top:0; height:100vh}
+.brand{display:flex; align-items:center; gap:10px; padding:6px 6px 18px}
+.brand .logo{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#2f6bff,#31d3f2);display:grid;place-items:center;font-weight:800;color:#061021;font-size:13px}
+.brand b{font-size:15px; letter-spacing:-.2px}
+.navitem{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-radius:10px;color:var(--muted);font-size:13.5px;cursor:default}
+.navitem.active{background:#17306b;color:#fff;font-weight:600}
+.navitem+.navitem{margin-top:2px}
+.side .sep{height:1px;background:var(--line);margin:10px 4px}
+.side .note{position:absolute;bottom:16px;left:14px;right:14px;font-size:11px;color:#5b6d92;line-height:1.6}
+
+/* ---------- Main ---------- */
+.main{flex:1; min-width:0; padding:18px 22px 40px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.title{font-size:21px;font-weight:700;letter-spacing:-.3px}
+.top .meta{display:flex;align-items:center;gap:14px;color:var(--muted);font-size:12.5px}
+.chip{border:1px solid var(--line);border-radius:999px;padding:5px 12px;background:#101a30}
+.tabs{display:flex;gap:18px;border-bottom:1px solid var(--line);margin:16px 0 18px}
+.tab{padding:8px 2px;color:var(--muted);font-size:13.5px;border-bottom:2px solid transparent}
+.tab.active{color:#fff;font-weight:600;border-bottom-color:var(--blue2)}
+
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.card.accent{background:linear-gradient(140deg,#1b62ff 0%,#0f3fd1 60%,#0b2f9e 100%);border-color:#2f6bff}
+.card h4{margin:0 0 10px;font-size:12.5px;font-weight:600;color:var(--muted);letter-spacing:.2px;display:flex;justify-content:space-between;align-items:center}
+.card.accent h4{color:#cfe0ff}
+.kpi{font-size:30px;font-weight:800;letter-spacing:-1px}
+.kpi small{font-size:13px;font-weight:600;color:var(--muted);margin-left:4px}
+.card.accent .kpi small{color:#d6e4ff}
+.sub{color:var(--muted);font-size:12px}
+.bar{height:8px;border-radius:6px;background:#1d2947;overflow:hidden}
+.bar>i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#2f6bff,#31d3f2)}
+.span3{grid-column:span 3}.span4{grid-column:span 4}.span5{grid-column:span 5}
+.span6{grid-column:span 6}.span7{grid-column:span 7}.span8{grid-column:span 8}
+.span9{grid-column:span 9}.span12{grid-column:span 12}
+@media(max-width:1080px){.span3,.span4,.span5,.span6,.span7,.span8,.span9{grid-column:span 12}.side{display:none}}
+
+.btn{appearance:none;border:1px solid transparent;border-radius:10px;padding:11px 20px;font-size:14px;font-weight:600;
+     font-family:inherit;cursor:pointer;background:var(--blue);color:#fff}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent;border-color:var(--line);color:var(--fg)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.sm{padding:7px 14px;font-size:12.5px}
+
+/* ---------- Quiz ---------- */
+.qhead{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.ostag{display:inline-block;font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:6px;background:#17306b;color:#9dc2ff;border:1px solid #2a4da8}
+.qtext{font-size:18px;font-weight:650;line-height:1.55;margin:12px 0 18px;letter-spacing:-.2px}
+.opt{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;background:var(--card2);border:1px solid var(--line);
+     border-radius:12px;padding:14px 16px;color:var(--fg);font-size:14px;font-family:inherit;cursor:pointer;margin-bottom:9px;line-height:1.5}
+.opt:hover{border-color:#3a5a9e}
+.opt .num{flex:0 0 22px;height:22px;border-radius:6px;background:#1d2947;display:grid;place-items:center;font-size:11.5px;font-weight:700;color:#9fb4dc}
+.opt.correct{border-color:#22c55e;background:#10321f}
+.opt.correct .num{background:#22c55e;color:#06210f}
+.opt.wrong{border-color:#f2542d;background:#361612}
+.opt.wrong .num{background:#f2542d;color:#2a0b05}
+.opt.locked{cursor:default}
+.feedback{border:1px solid var(--line);border-left:3px solid var(--blue2);background:#101a30;border-radius:10px;padding:13px 15px;margin-top:6px;font-size:13.3px;color:#c9d8f5}
+.feedback b{color:#fff}
+.feedback .verdict{font-weight:700;margin-bottom:5px;display:block}
+.v-ok{color:#4ade80}.v-no{color:#ff8a6b}
+.dots{display:flex;flex-wrap:wrap;gap:4px}
+.dot{width:13px;height:13px;border-radius:3px;background:#1d2947}
+.dot.ok{background:#22c55e}.dot.no{background:#f2542d}.dot.cur{outline:2px solid #31d3f2;outline-offset:1px}
+
+/* ---------- Result ---------- */
+.legend{display:flex;gap:14px;flex-wrap:wrap;color:var(--muted);font-size:11.5px;margin-top:8px}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:9px 8px;border-bottom:1px solid var(--line);text-align:left}
+th{color:var(--muted);font-weight:600;font-size:11.5px;letter-spacing:.3px}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.badge{display:inline-block;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700}
+.b-ok{background:#123524;color:#4ade80}.b-mid{background:#3a2f0c;color:#fbbf24}.b-no{background:#3a1710;color:#ff8a6b}
+.wrongitem{border:1px solid var(--line);border-radius:12px;padding:13px 15px;margin-bottom:9px;background:var(--card2)}
+.wrongitem .q{font-weight:600;margin:6px 0 8px;font-size:13.6px}
+.wrongitem .line{font-size:12.8px;color:var(--muted);margin:3px 0}
+.wrongitem .line b{color:#e8eefc;font-weight:600}
+.filterbar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.fbtn{border:1px solid var(--line);background:#101a30;color:var(--muted);border-radius:8px;padding:6px 13px;font-size:12.5px;cursor:pointer;font-family:inherit}
+.fbtn.on{background:#17306b;color:#fff;border-color:#2a4da8}
+.hidden{display:none !important}
+.footer{margin-top:26px;padding-top:14px;border-top:1px solid var(--line);color:#5b6d92;font-size:11.5px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.sr-only{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0,0,0,0)}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- Sidebar -->
+  <aside class="side">
+    <div class="brand"><div class="logo">D</div><b>Dibut Technician</b></div>
+    <div class="navitem active"><span>Dashboard</span><span>›</span></div>
+    <div class="navitem"><span>Assessment</span><span id="navQ">50</span></div>
+    <div class="sep"></div>
+    <div class="navitem"><span>Android OS</span><span class="nv" data-os="Android">10</span></div>
+    <div class="navitem"><span>Whale OS</span><span class="nv" data-os="Whale">10</span></div>
+    <div class="navitem"><span>Chrome OS</span><span class="nv" data-os="Chrome">10</span></div>
+    <div class="navitem"><span>iPadOS</span><span class="nv" data-os="iPad">10</span></div>
+    <div class="navitem"><span>Windows OS</span><span class="nv" data-os="Windows">10</span></div>
+    <div class="sep"></div>
+    <div class="navitem"><span>Analysis</span><span>⌄</span></div>
+    <div class="navitem"><span>Maintenance</span><span>⌄</span></div>
+    <div class="note">디벗 전문가(테크니션) 직무연수<br>강사 역량 자가진단 v1.0</div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="top">
+      <div>
+        <div class="title">디벗 테크니션 역량 진단</div>
+        <div class="sub" style="margin-top:4px">50문항 · 5개 OS 트랙 · 강사 사전 역량 점검</div>
+      </div>
+      <div class="meta">
+        <span class="chip" id="clock">--:--</span>
+        <span class="chip" id="stateChip">Ready</span>
+        <span class="chip">Instructor</span>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" id="tab1">General Status</div>
+      <div class="tab" id="tab2">Assessment</div>
+      <div class="tab" id="tab3">Competency Report</div>
+    </div>
+
+    <!-- ===== INTRO ===== -->
+    <section id="scr-intro">
+      <div class="grid">
+        <div class="card accent span4">
+          <h4>Assessment <span>50 EA</span></h4>
+          <div class="kpi">Ready</div>
+          <div class="sub" style="color:#d6e4ff;margin:8px 0 12px">안드로이드 · 웨일 · 크롬 · 아이패드 · 윈도우</div>
+          <div class="bar" style="background:#0b3ac4"><i style="width:100%;background:linear-gradient(90deg,#9fd0ff,#ffffff)"></i></div>
+        </div>
+        <div class="card span2"><h4>문항 수</h4><div class="kpi">50<small>문항</small></div><div class="sub" style="margin-top:8px">OS별 10문항</div></div>
+        <div class="card span2"><h4>OS 트랙</h4><div class="kpi">5<small>개</small></div><div class="sub" style="margin-top:8px">멀티 OS 대응</div></div>
+        <div class="card span2"><h4>예상 소요</h4><div class="kpi">25<small>분</small></div><div class="sub" style="margin-top:8px">문항당 약 30초</div></div>
+        <div class="card span2"><h4>합격 기준</h4><div class="kpi">80<small>%</small></div><div class="sub" style="margin-top:8px">강사 투입 권장선</div></div>
+
+        <div class="card span7">
+          <h4>진단 영역 구성 <span>Coverage</span></h4>
+          <div id="coverBars"></div>
+          <div class="legend"><span><i style="background:#2f6bff"></i>문항 수(각 10문항)</span><span><i style="background:#31d3f2"></i>핵심 관리 도구 기준</span></div>
+        </div>
+        <div class="card span5">
+          <h4>역량 등급 기준 <span>Grading</span></h4>
+          <table>
+            <tr><th>등급</th><th>정답률</th><th>해석</th></tr>
+            <tr><td><span class="badge b-ok">Lead</span></td><td class="num">90% 이상</td><td>단독 강의·타 강사 코칭 가능</td></tr>
+            <tr><td><span class="badge b-ok">Senior</span></td><td class="num">80–89%</td><td>단독 강의 가능</td></tr>
+            <tr><td><span class="badge b-mid">Associate</span></td><td class="num">60–79%</td><td>보조 강사·사전 보완 필요</td></tr>
+            <tr><td><span class="badge b-no">Foundation</span></td><td class="num">60% 미만</td><td>재학습 후 재진단 권장</td></tr>
+          </table>
+        </div>
+
+        <div class="card span12" style="display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap">
+          <div>
+            <div style="font-weight:700;font-size:15px">진단을 시작합니다</div>
+            <div class="sub" style="margin-top:4px">문항 선택 즉시 정오답과 해설이 표시됩니다. 키보드 1~4로 선택, Enter로 다음 문항 이동이 가능합니다.</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn ghost sm" id="btnShuffle">문항 순서 섞기: OFF</button>
+            <button class="btn" id="btnStart">진단 시작 →</button>
+          </div>
+        </div>
+        <div class="card span12" id="lastCard" style="display:none">
+          <h4>직전 진단 기록 <span>Local history</span></h4>
+          <div id="lastBody"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== QUIZ ===== -->
+    <section id="scr-quiz" class="hidden">
+      <div class="grid">
+        <div class="card span3"><h4>진행률</h4><div class="kpi"><span id="qNow">1</span><small>/ 50</small></div>
+          <div class="bar" style="margin-top:10px"><i id="progBar" style="width:2%"></i></div></div>
+        <div class="card span3"><h4>현재 정답률</h4><div class="kpi"><span id="curAcc">0</span><small>%</small></div>
+          <div class="sub" style="margin-top:10px">정답 <b id="okCnt" style="color:#4ade80">0</b> · 오답 <b id="noCnt" style="color:#ff8a6b">0</b></div></div>
+        <div class="card span3"><h4>현재 트랙</h4><div class="kpi" id="curOs" style="font-size:22px">Android</div>
+          <div class="sub" style="margin-top:10px" id="curOsProg">트랙 내 1 / 10</div></div>
+        <div class="card span3"><h4>경과 시간</h4><div class="kpi" id="elapsed" style="font-size:26px">00:00</div>
+          <div class="sub" style="margin-top:10px">문항당 평균 <span id="avgSec">0</span>초</div></div>
+
+        <div class="card span9">
+          <div class="qhead">
+            <div><span class="ostag" id="qOs">Android OS</span>
+              <span class="sub" style="margin-left:8px">Q<span id="qNo">1</span></span></div>
+            <div class="sub">키보드 1–4 선택 · Enter 다음</div>
+          </div>
+          <div class="qtext" id="qText">-</div>
+          <div id="optWrap"></div>
+          <div id="fbWrap"></div>
+          <div style="display:flex;justify-content:space-between;margin-top:16px;gap:8px">
+            <button class="btn ghost sm" id="btnPrev">← 이전</button>
+            <button class="btn" id="btnNext" disabled>다음 →</button>
+          </div>
+        </div>
+
+        <div class="card span3">
+          <h4>응답 현황 <span>Map</span></h4>
+          <div class="dots" id="dotMap"></div>
+          <div class="legend"><span><i style="background:#22c55e"></i>정답</span><span><i style="background:#f2542d"></i>오답</span><span><i style="background:#1d2947"></i>미응답</span></div>
+          <div class="sep" style="height:1px;background:var(--line);margin:14px 0"></div>
+          <h4>트랙별 진행</h4>
+          <div id="trackMini"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== RESULT ===== -->
+    <section id="scr-result" class="hidden">
+      <div class="grid">
+        <div class="card accent span4">
+          <h4>종합 역량 등급 <span id="gradeSub">Overall</span></h4>
+          <div style="display:flex;align-items:center;gap:18px">
+            <div id="donutTotal"></div>
+            <div>
+              <div class="kpi" id="gradeName" style="font-size:26px">-</div>
+              <div class="sub" style="color:#d6e4ff;margin-top:6px"><b id="scoreTxt" style="color:#fff">0 / 50</b></div>
+              <div class="sub" style="color:#d6e4ff">소요 <span id="timeTxt">00:00</span></div>
+            </div>
+          </div>
+          <div class="sub" style="color:#e4edff;margin-top:12px" id="gradeDesc">-</div>
+        </div>
+        <div class="card span2"><h4>정답률</h4><div class="kpi"><span id="rAcc">0</span><small>%</small></div><div class="sub" style="margin-top:8px">합격 기준 80%</div>
+          <div class="bar" style="margin-top:8px"><i id="rAccBar" style="width:0%"></i></div></div>
+        <div class="card span2"><h4>강점 트랙</h4><div class="kpi" id="bestOs" style="font-size:20px">-</div><div class="sub" style="margin-top:8px"><span id="bestVal">-</span></div></div>
+        <div class="card span2"><h4>보완 트랙</h4><div class="kpi" id="worstOs" style="font-size:20px">-</div><div class="sub" style="margin-top:8px"><span id="worstVal">-</span></div></div>
+        <div class="card span2"><h4>강의 가능 트랙</h4><div class="kpi"><span id="readyOs">0</span><small>/ 5</small></div><div class="sub" style="margin-top:8px">트랙 정답률 80% 이상</div></div>
+
+        <div class="card span5">
+          <h4>OS별 역량 레이더 <span>Radar</span></h4>
+          <div id="radarWrap" style="display:grid;place-items:center;padding:4px 0 0"></div>
+          <div class="legend"><span><i style="background:#2f6bff"></i>내 정답률</span><span><i style="background:#3b4a6b"></i>기준선 80%</span></div>
+        </div>
+        <div class="card span7">
+          <h4>OS별 정답률 <span>Track score</span></h4>
+          <div id="osBars"></div>
+          <div class="legend"><span><i style="background:#22c55e"></i>80% 이상</span><span><i style="background:#f5b301"></i>60–79%</span><span><i style="background:#f2542d"></i>60% 미만</span></div>
+        </div>
+
+        <div class="card span7">
+          <h4>문항별 정오 히트맵 <span>50 items</span></h4>
+          <div id="heat"></div>
+        </div>
+        <div class="card span5">
+          <h4>진단 이력 추이 <span>Attempts</span></h4>
+          <div id="history"></div>
+        </div>
+
+        <div class="card span12">
+          <h4>트랙별 진단 코멘트 <span>Diagnosis</span></h4>
+          <table id="diagTable">
+            <thead><tr><th>OS 트랙</th><th class="num">정답</th><th class="num">정답률</th><th>상태</th><th>코칭 코멘트</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div class="card span12">
+          <h4>오답 리뷰 <span id="wrongCount">0건</span></h4>
+          <div class="filterbar" id="wrongFilter"></div>
+          <div id="wrongList"></div>
+        </div>
+
+        <div class="card span12" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+          <button class="btn ghost sm" id="btnCopy">결과 요약 복사</button>
+          <button class="btn ghost sm" id="btnJson">결과 JSON 다운로드</button>
+          <button class="btn ghost sm" id="btnRetryWrong">오답만 다시 풀기</button>
+          <button class="btn sm" id="btnRetry">전체 다시 풀기</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer">
+      <span>디벗 전문가(테크니션) 직무연수 소스 기반 · 강사 역량 자가진단 웹앱</span>
+      <span>Single-file static app · 결과는 브라우저 localStorage에만 저장됩니다</span>
+    </div>
+  </main>
+</div>
+
+<script>
+/* =========================================================
+   문항 데이터 : OS별 10문항 (총 50문항)
+   ========================================================= */
+const BANK = [
+/* ---------------- Android ---------------- */
+{os:"Android", q:"기존 Argos MDM 방식과 신규 Argos AMA(Android Management API)의 가장 핵심적인 기능 차이는 무엇인가?",
+ opts:["Google Play Store 앱 검색 및 원격 설치(배포)가 가능해진 점","기기별 개별 요금제를 부여할 수 있게 된 점","학내망 없이도 관리자 사이트 접속이 가능해진 점","교사 계정 없이도 학생이 앱을 자유 설치할 수 있는 점"],
+ a:0, exp:"기존 MDM은 APK 파일을 수동으로 구해 배포해야 했으나, AMA 환경에서는 Google Play Store에서 앱을 직접 검색해 원격 배포할 수 있고 잠금화면 제어, 초기 부팅 Setup Wizard 간소화 등이 가능합니다."},
+{os:"Android", q:"스마트 단말 관리 시스템(Argos MDM/AMA) 관리자 사이트 주소와 접속 전제 조건으로 옳은 것은?",
+ opts:["https://mdm.sen.go.kr · 외부 인터넷 어디서나 접속 가능","https://mdm.sen.go.kr · 학교 학내망 또는 eVPN 연결 상태에서만 접속 가능","https://argos.go.kr · 교사 개인 인증서 보유 시 접속 가능","https://sen.go.kr/mdm · 구글 계정 로그인 시 접속 가능"],
+ a:1, exp:"접속 주소는 https://mdm.sen.go.kr 이며, 보안상 학교 학내망 또는 eVPN 연결 상태에서만 접속할 수 있습니다."},
+{os:"Android", q:"안드로이드 디벗 기기가 관리자 서버(MDM/AMA) 단말 현황에 잡히지 않을 때 가장 먼저 점검할 항목은?",
+ opts:["기기의 배터리 최적화 해제 여부","교사 계정의 관리자 권한 등급","[스마트 단말 관리 에이전트] 앱의 권한(위치·전화 등) 허용 여부","단말의 화면 잠금 시간 설정"],
+ a:2, exp:"에이전트 앱 권한(위치, 전화 등)이 허용되지 않았거나 무선망에 정상 접속되어 있지 않으면 MDM 서버에서 기기가 조회되지 않습니다. 권한 허용 여부를 최우선으로 확인합니다."},
+{os:"Android", q:"학생이 잠금 비밀번호(패턴)를 잊은 상태에서 기기를 재부팅했을 때 발생하는 문제는?",
+ opts:["부팅 후 최초 1회 비밀번호 입력 전에는 원격 잠금 해제·위치 확인이 동작하지 않는다","재부팅 즉시 공장 초기화가 자동 실행된다","MDM 에이전트가 삭제되어 재설치가 필요하다","비밀번호가 자동으로 초기값으로 복원된다"],
+ a:0, exp:"부팅 후 최초 1회 비밀번호가 입력되기 전에는 네트워크가 연결되어 있어도 MDM을 통한 원격 잠금 해제나 위치 확인이 동작하지 않습니다. 따라서 기기가 재부팅되거나 전원이 꺼지지 않도록 안내해야 합니다."},
+{os:"Android", q:"Argos MDM/AMA 단말 초기화 기능 중 '간편 초기화'와 '공장 초기화'의 차이로 옳은 것은?",
+ opts:["간편 초기화는 데이터만 지우고 공장 초기화는 앱만 지운다","간편 초기화는 원격 실행이 불가하고 공장 초기화만 원격 실행된다","간편 초기화는 에이전트·Wi-Fi 설정을 유지하고, 공장 초기화는 에이전트와 교육청 기본 앱까지 삭제된다","두 기능은 동일하며 명칭만 다르다"],
+ a:2, exp:"간편 초기화는 스마트 단말 관리 에이전트와 Wi-Fi 설정을 유지한 채 데이터만 초기화합니다. 공장 초기화는 출시 상태로 되돌려 에이전트와 교육청 기본 앱까지 모두 삭제되므로 재설치·재등록 절차가 필요합니다."},
+{os:"Android", q:"관리자 웹 단말 현황 카드에서 '연결 아이콘(Wi-Fi 모양)'이 활성화된 것은 무엇을 의미하는가?",
+ opts:["해당 단말이 관리 서버와 정상 연결되어 명령 수신이 가능한 온라인 상태","해당 단말이 교내 Wi-Fi 비밀번호를 저장한 상태","해당 단말이 분실 등록된 상태","해당 단말의 데이터 사용량이 초과된 상태"],
+ a:0, exp:"연결 아이콘 활성화는 단말이 MDM/AMA 관리 서버와 현재 정상적으로 무선 연결되어 원격 명령을 수신할 수 있는 온라인 상태임을 뜻합니다."},
+{os:"Android", q:"디벗 기기 분실 시 '분실 등록' 기능이 제공하는 주요 역할 4가지에 포함되지 않는 것은?",
+ opts:["잠금 메시지 출력","연락처 전화번호 표시","교내 탐색용 소리 알림 발생","단말 저장 데이터의 자동 백업"],
+ a:3, exp:"분실 등록의 주요 역할은 ① 잠금 메시지 출력 ② 연락처 전화번호 표시 ③ 교내 탐색을 위한 소리 알림 발생 ④ 지도 기반 위치(위도·경도·주소) 확인입니다. 자동 백업은 해당하지 않습니다."},
+{os:"Android", q:"학기 중 전입생에게 예비 기기를 지급하며 해당 학급 조직으로 변경 등록하는 올바른 절차는?",
+ opts:["[단말 현황]에서 기기를 삭제 후 재등록한다","[조직/계정 관리] > [조직 관리]에서 대상 학급 선택 후 '예비기기' 조직의 단말을 선택해 추가(이동)한다","기기를 공장 초기화한 뒤 학생이 직접 학급 코드를 입력한다","교육청에 공문으로 조직 이동을 요청한다"],
+ a:1, exp:"[조직/계정 관리] > [조직 관리]에서 대상 학급을 선택한 뒤, '예비기기' 조직에 속한 단말 중 지급할 기기를 선택해 추가(이동)하면 됩니다."},
+{os:"Android", q:"학년 초 진급 작업에서 단말·사용자 이름을 일괄 변경하는 방법과 제한 사항으로 옳은 것은?",
+ opts:["엑셀(CSV) 템플릿을 내려받아 수정 후 업로드하며, 에이전트 미설치 단말은 '사용자 이름'만 수정 가능하다","관리자 웹에서 기기를 하나씩 클릭해 수정하는 방법만 제공된다","엑셀 업로드 시 에이전트 미설치 단말도 모든 항목을 수정할 수 있다","일괄 변경은 교육청 관리자만 수행할 수 있다"],
+ a:0, exp:"[단말 현황]에서 엑셀(CSV) 템플릿을 다운로드해 수정 후 업로드하면 일괄 변경됩니다. 다만 에이전트가 미설치된 단말은 '단말 이름' 수정이 불가하고 '사용자 이름'만 수정할 수 있습니다."},
+{os:"Android", q:"안드로이드 디벗의 학교급별 주요 보급 기종 현황으로 옳은 것은?",
+ opts:["초: 갤럭시탭 A9 / 중: S6 Lite / 고: S8","초: 갤럭시탭 S9 FE+ · S10 FE+ / 중: S7 FE+ · S9 FE+ / 고: S9 FE+","초·중·고 모두 갤럭시탭 S7 FE+ 단일 기종","초: S9 FE+ / 중: S10 FE+ / 고: A9+"],
+ a:1, exp:"초등학교는 갤럭시탭 S9 FE+ / S10 FE+, 중학교는 S7 FE+ / S9 FE+, 고등학교는 S9 FE+가 보급 운영되고 있습니다."},
+
+/* ---------------- Whale ---------------- */
+{os:"Whale", q:"웨일 생태계를 구성하는 4가지 핵심 요소로 올바른 조합은?",
+ opts:["웨일 OS · 웨일북 · 웨일스페이스 · 웨일 브라우저","웨일 OS · 웨일톡 · 웨일클라우드 · 웨일 브라우저","웨일북 · 웨일패드 · 웨일스페이스 · 웨일스토어","웨일 OS · 웨일북 · 네이버웍스 · 웨일 브라우저"],
+ a:0, exp:"웨일 OS(스페이스 구동·기기 통제 OS), 웨일북(교육용 하드웨어), 웨일스페이스(통합 계정·수업·에듀테크 플랫폼), 웨일 브라우저(수업 접근 창구)로 구성됩니다."},
+{os:"Whale", q:"웨일 OS의 기반 운영체제와 웹 OS로서의 특징으로 옳은 것은?",
+ opts:["Windows 기반이며 로컬 설치형 프로그램 중심이다","Linux 기반 웹 OS로 빠른 부팅, 자동 업데이트, 강력한 보안성을 제공한다","Android 기반이며 Play 스토어 앱 중심으로 동작한다","독자 커널 기반으로 인터넷 없이만 동작한다"],
+ a:1, exp:"웨일 OS는 Linux(리눅스) 기반 웹 OS로, 빠른 부팅 속도와 자동 시스템 업데이트, 강력한 보안성, 웹 앱 중심의 안정적인 수업 환경을 제공합니다."},
+{os:"Whale", q:"웨일북 관리 도구 WBC(Whalebook Control)의 두 가지 핵심 영역은?",
+ opts:["수업관리 · 웨일스페이스 Admin","기기관리 · 앱스토어","학생관리 · 학부모 알림","네트워크 관리 · 보안 관제"],
+ a:0, exp:"WBC는 웨일북으로 수업과 학생 기기를 관리·통제하는 기능으로, 수업 중 모니터링·제어를 담당하는 '수업관리'와 계정·기기·정책을 관리하는 '웨일스페이스 Admin'으로 나뉩니다."},
+{os:"Whale", q:"WBC '수업관리'로 교사가 학생 화면을 모니터링·제어할 때 무선 네트워크 조건은?",
+ opts:["교사와 학생이 반드시 동일 AP에 접속해야 한다","교사·학생 기기가 동일 AP망이 아니어도 수업관리 기능 활용이 가능하다","교사는 유선, 학생은 무선이어야 한다","교내망이 아닌 외부망에서만 가능하다"],
+ a:1, exp:"WBC 수업관리는 교사와 학생 기기가 동일한 AP(무선망)에 접속되어 있지 않아도 모니터링·제어 기능을 사용할 수 있습니다."},
+{os:"Whale", q:"웨일스페이스 Admin에서 최상위 조직 정책을 변경할 때의 영향과, 특정 학급만 다르게 설정하는 방법은?",
+ opts:["최상위 정책은 하위에 상속되지 않으므로 조직마다 개별 설정해야 한다","최상위 정책 변경 시 하위 모든 조직에 자동 상속되며, 개별 설정은 해당 하위 조직을 직접 선택해 변경한다","하위 조직 정책이 항상 최상위 정책을 덮어쓴다","학급 단위 정책 설정 기능은 제공되지 않는다"],
+ a:1, exp:"최상위 조직 정책을 변경하면 하위 모든 조직에 동일하게 자동 상속됩니다. 특정 학급만 다르게 운영하려면 해당 하위 조직을 직접 선택한 뒤 정책을 변경해야 합니다."},
+{os:"Whale", q:"웨일스페이스 Admin의 웹사이트 차단·허용 정책에서 도메인 지정 외에 추가로 설정할 수 있는 옵션은?",
+ opts:["차단 시간 및 허용 시간 설정(요일·시간대별 정책)","학생별 데이터 사용량 제한","브라우저 테마 강제 지정","기기 배터리 사용 제한"],
+ a:0, exp:"차단/허용 도메인 지정과 함께 '차단 시간 및 허용 시간 설정'이 가능해 요일·시간대별 맞춤형 접근 정책을 부여할 수 있습니다."},
+{os:"Whale", q:"웨일북 초기화 후 교내 Wi-Fi에 자동 접속되도록 제어하는 Admin 콘솔 경로는?",
+ opts:["어드민 > 사용자 > 계정정책 > 네트워크","어드민 > 서비스 > 웨일 스페이스 정책 > 기기설정 > 네트워크 > 기기 네트워크","어드민 > 기기 > 초기화 > Wi-Fi 복원","어드민 > 수업관리 > 네트워크 제어"],
+ a:1, exp:"'어드민 > 서비스 > 웨일 스페이스 정책 > 기기설정 > 네트워크 > 기기 네트워크' 경로에서 와이파이 자동 연결을 설정합니다."},
+{os:"Whale", q:"2026학년도 보급 웨일북(14TN30T)이 이전 보급형(14TN30S) 대비 강화된 하드웨어 변경점은?",
+ opts:["저장공간 64GB→128GB eMMC, Intel Twin Lake N150 CPU, 800만 화소 월드페이싱 카메라","화면 크기 14인치→16인치 확대","배터리 용량 2배 및 LTE 모듈 기본 탑재","키보드 제거 및 터치 전용 전환"],
+ a:0, exp:"저장공간이 64GB eMMC에서 128GB eMMC로 확장되고, Intel Twin Lake N150 CPU 적용, 800만 화소 월드페이싱 카메라가 탑재되었습니다."},
+{os:"Whale", q:"웨일북 키보드 상단 핫키 구성의 특징으로 옳은 것은?",
+ opts:["F1~F12 기능키가 그대로 배치되어 있다","페이지 이동·새로고침·전체화면·화면 기록·클로바AI·검색/런처 등 전용 핫키가 배치되어 있다","숫자 키패드가 상단에 배치되어 있다","핫키 없이 터치 제스처로만 제어한다"],
+ a:1, exp:"F1~F12 대신 페이지 이동, 새로고침, 전체화면, 화면 기록(캡처/녹화), 클로바AI 키, 검색 및 런처 키 등 직관적인 전용 핫키가 배치되어 있습니다."},
+{os:"Whale", q:"서울시교육청 디벗 운영 정책상 학생 진급 시 기기 관리 원칙은?",
+ opts:["학년 말마다 반납 후 새 기기를 재배정한다","처음 수령한 기기를 졸업할 때까지 학생이 직접 소지하고 진급한다","학기마다 학급 단위로 기기를 교체한다","기기는 학교 보관이 원칙이며 수업 시간에만 대여한다"],
+ a:1, exp:"학생이 처음 기기를 수령하면 졸업할 때까지 해당 기기를 직접 소지하고 진급하는 것이 서울시교육청의 기본 정책입니다."},
+
+/* ---------------- Chrome ---------------- */
+{os:"Chrome", q:"크롬북 관리의 제1원리인 \"기기가 본체가 아니라 계정이 본체\"라는 말의 의미는?",
+ opts:["학습 데이터는 클라우드에, 정책은 계정의 OU에 걸려 기기를 바꿔도 로그인하면 환경·정책이 즉시 복원된다","기기 시리얼 번호로만 정책을 적용한다는 의미다","계정 없이도 기기 정책이 유지된다는 의미다","기기 가격보다 계정 라이선스가 비싸다는 의미다"],
+ a:0, exp:"학습 데이터는 클라우드에 남고 통제 정책은 계정의 조직 단위(OU)에 걸리므로, 기기를 초기화하거나 교체해도 새 기기에 로그인하면 동일한 환경과 정책이 즉시 복원됩니다."},
+{os:"Chrome", q:"CEU(Chrome Education Upgrade) 라이선스의 성격과 미보유 시의 결정적 한계는?",
+ opts:["연 단위 구독이며 없으면 앱 설치만 제한된다","기기 단위 영구(perpetual) 라이선스이며, 없으면 학교 도메인에 기기 등록(enrollment) 자체가 불가능하다","사용자 단위 라이선스이며 없으면 로그인 속도가 느려진다","무료 라이선스이며 없어도 모든 관리 기능을 쓸 수 있다"],
+ a:1, exp:"CEU는 기기 단위 영구(perpetual) 라이선스로, 없으면 학교 도메인에 기기 등록 자체가 불가능해 중앙 관리·정책 적용·원격 잠금·강제 재등록을 할 수 없습니다."},
+{os:"Chrome", q:"학생 OU에서 개발자 도구(DeveloperToolsAvailability)를 사용 중지(값 2)로 설정해야 하는 핵심 이유는?",
+ opts:["기기 배터리 소모를 줄이기 위해","저장공간 확보를 위해","요소 삭제로 차단 안내창 우회, 소스 확인을 통한 정답 노출, 스크립트 실행을 통한 필터 무력화를 막기 위해","교사 화면 공유 속도를 높이기 위해"],
+ a:2, exp:"개발자 도구가 열려 있으면 요소 삭제를 통한 차단 안내창 우회, 소스 코드를 통한 정답 확인, 스크립트 실행을 통한 필터 무력화가 가능해져 온라인 평가와 정책이 무력화됩니다."},
+{os:"Chrome", q:"관리 콘솔 정책이 크롬북에 실제로 적용되었는지 현장에서 즉시 검증하는 방법은?",
+ opts:["주소창에 chrome://policy 입력 후 '정책 새로고침'을 클릭해 내려온 정책명·값을 확인한다","설정 > 정보 > 업데이트 확인을 누른다","기기를 공장 초기화한 뒤 재로그인한다","관리 콘솔에서 보고서를 24시간 후 확인한다"],
+ a:0, exp:"주소창에 chrome://policy 를 입력해 접근한 뒤 '정책 새로고침'을 클릭하면 실제로 내려온 정책 이름과 값을 즉시 눈으로 확인할 수 있습니다."},
+{os:"Chrome", q:"조직 단위(OU)와 그룹(Groups)의 차이 및 앱·확장 프로그램 정책의 우선순위로 옳은 것은?",
+ opts:["OU는 다중 소속, 그룹은 단일 소속이며 OU가 항상 우선한다","OU는 단일 소속, 그룹은 다중 소속 예외 처리용이며 앱·확장 프로그램 정책은 그룹이 OU를 덮어쓴다","둘 다 다중 소속이며 먼저 만든 정책이 우선한다","그룹은 정책 적용에 사용할 수 없다"],
+ a:1, exp:"OU는 사용자당 1개만 속하는 단일 구조이고 그룹은 다중 소속이 가능한 예외 처리용 태그입니다. 앱 및 확장 프로그램 정책에서는 그룹 설정이 OU 설정을 덮어써 우선 적용됩니다."},
+{os:"Chrome", q:"Chrome 관리 콘솔의 앱·확장 프로그램 설치 정책 4가지 대표 유형에 해당하지 않는 것은?",
+ opts:["강제 설치(제거 불가)","강제 설치 및 작업표시줄 고정","설치 허용(사용자 자율 설치)","설치 예약(특정 날짜 자동 설치)"],
+ a:3, exp:"대표 유형은 강제 설치, 강제 설치 및 작업표시줄 고정, 설치 허용, 차단(설치 금지 및 기존 앱 제거)입니다. '설치 예약'은 해당 정책 유형이 아닙니다."},
+{os:"Chrome", q:"URL 화이트리스트 구성 시 누락되면 크롬북 로그인 자체가 불가능해지는 1순위 등록 영역은?",
+ opts:["Google 계정 로그인 및 인증 관련 도메인(인증 인프라)","교육청 홈페이지 도메인","유튜브 교육용 도메인","학교 LMS 도메인"],
+ a:0, exp:"가장 먼저 등록해야 하는 영역은 Google 계정 로그인·인증 관련 도메인(인증 인프라)입니다. 이 영역이 빠지면 로그인 자체가 되지 않습니다."},
+{os:"Chrome", q:"교육청 통합 워크스페이스(센스쿨) 운영과 학교 자체 도메인 운영의 차이 및 이관 시 주의사항은?",
+ opts:["센스쿨은 관리 부담이 늘지만 CEU를 추가로 받는다","센스쿨은 관리·정책 책임이 교육청으로 이관돼 업무가 줄지만, 자체 도메인에서 이관 시 기존 구매 CEU 라이선스를 가져갈 수 없다","자체 도메인에서 센스쿨로 CEU를 그대로 이전할 수 있다","두 방식은 관리 범위와 라이선스 모두 동일하다"],
+ a:1, exp:"센스쿨은 관리 부담과 정책 책임이 교육청으로 넘어가 업무가 줄어듭니다. 다만 자체 도메인을 운영하다 센스쿨로 이관하면 기존에 구매한 CEU 라이선스를 가져갈 수 없습니다."},
+{os:"Chrome", q:"담당자 전보·계정 잠금 리스크를 막기 위한 관리 콘솔 계정 수칙은?",
+ opts:["최고 관리자 1명으로 단일화하고 비밀번호를 공유한다","전보 주기가 다른 최고 관리자를 2명 이상 지정하고 2단계 인증(2FA)을 강제 적용한다","관리자 계정을 학생회에도 부여한다","비밀번호를 학교 공용 문서에 기록해 둔다"],
+ a:1, exp:"전보 주기가 서로 다른 최고 관리자를 최소 2명 이상 지정하고, 모든 관리자 계정에 2단계 인증(2FA)을 강제 적용하는 것이 기본 수칙입니다."},
+{os:"Chrome", q:"신학기 크롬북 배부 직전 반드시 이행해야 하는 '첫 로그인' 원칙의 목적은?",
+ opts:["배터리 충전 상태를 확인하기 위해","학교 계정으로 첫 로그인해 기기 등록(enrollment), OU 배치, 정책 적용 여부를 사전 검증하기 위해","학생 개인 계정을 미리 등록해 두기 위해","기기 시리얼 번호를 수기로 기록하기 위해"],
+ a:1, exp:"배부 전 학교 계정으로 첫 로그인을 진행해 기기 등록(enrollment)이 되었는지, 올바른 OU에 배치되었는지, 정책이 정상 적용되는지를 사전에 검증하기 위함입니다."},
+
+/* ---------------- iPad ---------------- */
+{os:"iPad", q:"Apple 기기 관리 생태계의 기본 관리 메커니즘으로 옳은 것은?",
+ opts:["프로필(Profile) 기반 관리로, ASM·MDM·ADE 구조를 통해 프로필을 설치해 제어한다","레지스트리 기반 정책 배포로 제어한다","기기별 로컬 관리자 계정으로만 제어한다","앱스토어 구매 이력 기반으로 제어한다"],
+ a:0, exp:"Apple 기기는 프로필(Profile) 기반으로 관리되며, ASM·MDM·ADE 등의 구조를 통해 프로필을 기기에 설치하여 제어합니다."},
+{os:"iPad", q:"ASM(Apple School Manager)의 정의와 핵심 역할로 옳은 것은?",
+ opts:["아이패드 수리 접수 전용 포털","Apple의 교육용 웹 기반 관리 포털로 관리형 Apple 계정 생성, VPP 앱 라이선스 관리, MDM 연결, 수업 구조 동기화를 담당","학생 성적 관리 전용 LMS","Apple 기기 구매 견적 시스템"],
+ a:1, exp:"ASM은 Apple의 교육용 웹 기반 관리 포털로, 관리형 Apple 계정 생성, 구매 앱(VPP) 라이선스 관리, 기기 관리 서비스(MDM) 연결, 수업 구조 동기화를 담당합니다."},
+{os:"iPad", q:"ASM에서 SSO(Single Sign-On)와 프로비저닝을 연동할 때 이메일 설정 관련 유의사항은?",
+ opts:["관리형 Apple 계정 이메일은 임의로 지정해도 자동 매칭된다","Microsoft Entra ID 등 외부 SSO 연동 시 관리형 Apple 계정 이메일이 SSO 로그인 계정(MS 이메일)과 정확히 일치해야 한다","이메일 대신 학번만 일치하면 된다","SSO 연동 시에는 이메일 필드를 비워 두어야 한다"],
+ a:1, exp:"Microsoft Entra ID 등 외부 SSO와 연동할 때는 관리형 Apple 계정의 이메일 주소가 SSO 로그인 계정(MS 이메일 주소)과 정확히 일치해야 정상 연동됩니다."},
+{os:"iPad", q:"ASM 포털과 학교 MDM 서버를 상호 연결하기 위해 ASM에서 다운로드해 MDM에 등록해야 하는 파일은?",
+ opts:["APNs 인증서 요청서(CSR)","MDM 서버 토큰(MDM Token)","VPP 구매 내역 CSV","기기 일련번호 목록 PDF"],
+ a:1, exp:"ASM에서 MDM 서버 토큰(MDM Token) 파일을 다운로드해 학교 MDM에 등록함으로써 ASM–MDM 상호 연결이 완료됩니다."},
+{os:"iPad", q:"ADE(Automated Device Enrollment, 구 DEP)를 통한 아이패드 등록의 관리적 장점은?",
+ opts:["기기 언박싱·초기 설정 시 학교 MDM에 자동 등록되고 학생이 관리 프로필을 임의로 삭제할 수 없게 강제 설정할 수 있다","기기 가격을 할인받을 수 있다","앱을 무제한 무료로 사용할 수 있다","MDM 없이도 원격 제어가 가능해진다"],
+ a:0, exp:"ADE는 기기 언박싱 및 초기 설정 단계에서 학교 MDM으로 자동 등록되게 하며, 학생이 관리 프로필을 임의로 삭제할 수 없도록 강제 세팅할 수 있습니다."},
+{os:"iPad", q:"Apple 기기 제어에서 '명령(Command)'과 '프로필(Profile)'의 개념 차이는?",
+ opts:["명령은 영구 설정, 프로필은 1회성 동작이다","명령은 재부팅·원격 잠금·위치 확인 등 1회성 제어 동작이고, 프로필은 Wi-Fi·제약 조건 등 기기에 설치되어 유지되는 설정 묶음이다","둘 다 1회성 동작이며 차이가 없다","프로필은 교사만, 명령은 학생만 실행할 수 있다"],
+ a:1, exp:"명령은 재부팅, 원격 잠금, 위치 확인 등 1회성으로 전송되는 제어 동작이며, 프로필은 Wi-Fi·제약 조건 등 기기 내부에 설치되어 지속 유지되는 설정 묶음입니다."},
+{os:"iPad", q:"현장 시범 사례에서 상용 MDM 대신 웹 기반 Custom MDM을 직접 구축해 활용한 배경은?",
+ opts:["라이선스 비용이 전혀 들지 않아서","기존 보급 MDM의 한국어 미지원·Apple 신규 기능 반영 지연을 해결하고, 교사가 모바일/웹에서 간편히 원격 잠금·제어하도록 최적화하기 위해","Apple이 상용 MDM 사용을 금지해서","학생이 직접 기기를 관리하게 하려고"],
+ a:1, exp:"기존 보급 MDM의 한국어 미지원 또는 Apple 신규 기능 업데이트 반영 지연 문제를 해결하고, 교사가 모바일·웹에서 아이패드를 간편하게 원격 잠금·제어할 수 있도록 최적화하기 위함입니다."},
+{os:"iPad", q:"Apple 스쿨워크(Schoolwork)의 수업 클래스를 자동 생성하기 위해 ASM에서 활용할 수 있는 디렉토리 동기화 방식은?",
+ opts:["SFTP 디렉토리 연동(CSV 업로드)","블루투스 페어링 동기화","AirDrop 일괄 전송","iCloud 백업 복원"],
+ a:0, exp:"ASM의 SFTP 디렉토리 연동을 통해 사용자 및 수업 데이터를 CSV로 업로드하면 스쿨워크 수업이 자동 생성됩니다."},
+{os:"iPad", q:"Apple MDM 콘솔에서 아이패드 외에 통합 관리할 수 있는 OS 라인업은?",
+ opts:["iOS(iPhone·iPad), macOS, tvOS(Apple TV)","iOS, Android, Windows","macOS, ChromeOS, Linux","iOS와 watchOS 전용"],
+ a:0, exp:"Apple MDM 콘솔에서는 iOS(iPhone, iPad), macOS, tvOS(Apple TV)를 한 곳에서 통합 관리할 수 있습니다."},
+{os:"iPad", q:"학생이 아이패드 비밀번호를 잊거나 기기가 잠겼을 때 MDM에서 수행하는 일반적인 조치는?",
+ opts:["기기를 수거해 애플 서비스센터로 발송한다","MDM 단말 관리 메뉴에서 '원격 비밀번호(암호) 잠금 해제/초기화' 명령을 실행한다","학생 Apple 계정을 삭제한다","ASM에서 기기 일련번호를 해제한다"],
+ a:1, exp:"MDM 단말 관리 메뉴에서 '원격 비밀번호(암호) 잠금 해제/초기화' 명령을 실행해 조치하는 것이 일반적입니다."},
+
+/* ---------------- Windows ---------------- */
+{os:"Windows", q:"윈도우 LMS·M365 환경에서 '테넌트(Tenant)'의 개념과 계정 마스터의 역할은?",
+ opts:["테넌트는 기기 그룹이고, 계정 마스터는 기기 수리 담당자다","테넌트는 학교에 할당된 가상 조직 공간이며, 계정 마스터는 마스터 키로 교직원·학생 M365 계정을 발급·관리하는 관리자다","테넌트는 무선 AP 단위이고, 계정 마스터는 네트워크 관리자다","테넌트는 라이선스 명칭이고, 계정 마스터는 구매 담당자다"],
+ a:1, exp:"테넌트는 학교에 할당된 가상 조직 공간이며, 계정 마스터는 공문 등으로 전달받은 마스터 키를 이용해 교직원·학생에게 M365 계정을 발급·관리하는 관리자입니다."},
+{os:"Windows", q:"M365 계정 생성 시 '교직원용 A3'와 '학생용 A3' 라이선스를 엄격히 구분해야 하는 이유는?",
+ opts:["교사용 라이선스를 부여하는 순간 시스템상 교사 권한으로 인정되며, 학교별 교사·학생용 수량이 정해져 있기 때문","두 라이선스의 저장 용량이 완전히 동일하기 때문","학생용이 더 비싸기 때문","라이선스 구분 없이 자동 배정되기 때문"],
+ a:0, exp:"교사용 라이선스가 부여되는 순간 해당 계정은 시스템상 교사 권한으로 인정되며, 학교마다 교사용·학생용 라이선스 수량이 정해져 있으므로 엄격히 구분해 부여해야 합니다."},
+{os:"Windows", q:"윈도우 디벗 기기의 중앙 단말 관리·보안 정책 배포에 사용하는 마이크로소프트 MDM 솔루션은?",
+ opts:["Microsoft Intune for Education","Windows Server Update Services","Microsoft Defender for Endpoint","Azure DevOps"],
+ a:0, exp:"윈도우 디벗의 중앙 단말 관리와 보안 정책 배포에는 Microsoft Intune for Education(인튠)을 사용합니다."},
+{os:"Windows", q:"Microsoft Teams 기반 가상교실 운영 시 학교 전체에 제공되는 OneDrive 클라우드 기본 용량은?",
+ opts:["사용자당 1TB, 총량 무제한","학교 전체 총 100TB","학교 전체 총 10TB","학생당 100GB 고정"],
+ a:1, exp:"윈도우 LMS 환경에서는 학교 전체에 총 100TB의 원드라이브 클라우드 용량이 제공됩니다."},
+{os:"Windows", q:"윈도우 Admin/MDM 직무연수에서 다루는 디벗 담당자의 연간 관리 스테이지 흐름으로 옳은 것은?",
+ opts:["스테이지 1·2(3~4월 계정 세팅·기기 보급) → 3(학기 중 민원·수리 추적·통합설정 USB) → 4~6(방학 점검·양품화·ClassSync 승급)","스테이지 1(방학 점검) → 2(계정 세팅) → 3(졸업 처리)","스테이지 1~3(기기 구매) → 4~6(폐기)","월별 1~12 스테이지로 구분한다"],
+ a:0, exp:"스테이지 1·2(3~4월 계정 세팅 및 기기 보급) → 스테이지 3(학기 중 민원, 수리 추적, 통합설정 USB) → 스테이지 4~6(방학 점검, 양품화, ClassSync 승급) 순으로 진행됩니다."},
+{os:"Windows", q:"학년도 변경 시 윈도우 디벗 기기·학급 계정 정보를 신학년으로 승급 동기화하는 프로그램은?",
+ opts:["ClassSync(클래스싱크)","ClassRoom Manager","SchoolSync","EduMigrator"],
+ a:0, exp:"학년도 변경 시에는 ClassSync(클래스싱크) 승급 프로그램을 활용해 기기·학급 계정 정보를 신학년으로 동기화합니다."},
+{os:"Windows", q:"M365의 AI 기반 학습 가속화 도구 '러닝 프로그레스(Learning Progress)'의 대표 세부 도구로 묶인 것은?",
+ opts:["읽기 진행 · 검색 코치 · 발표자 코치","팀즈 채널 · 플래너 · 스웨이","엑셀 코파일럿 · 파워BI · 폼즈","인튠 · 엔트라 ID · 디펜더"],
+ a:0, exp:"러닝 프로그레스의 대표 도구는 읽기 진행(Reading Progress), 검색 코치(Search Coach), 발표자 코치(Speaker Coach)이며 몰입형 리더 등도 함께 제공됩니다."},
+{os:"Windows", q:"M365 라이선스 신규 발급·수량 조절 지원을 요청해야 하는 곳은?",
+ opts:["교육청별 Office365 가입센터(에이마스/AMAS 지원센터)","마이크로소프트 본사 영업팀","학교 행정실 회계 담당","기기 제조사 A/S 센터"],
+ a:0, exp:"M365 라이선스 신규 발급이나 수량 조절은 교육청별 Office365 가입센터(에이마스/AMAS 지원센터)에 접속해 요청합니다."},
+{os:"Windows", q:"윈도우 디벗 보급 직후인 3월 체크리스트에서 담당 교사가 가장 먼저 실습·확인해야 하는 작업은?",
+ opts:["폐기 기기 반납 목록 작성","M365/Argos 실습기 계정 세팅, 학생용·교사용 라이선스 맵핑 및 단말–계정 연결 확인","여름방학 양품화 일정 수립","ClassSync 승급 리허설"],
+ a:1, exp:"3월 체크리스트의 핵심은 M365/Argos 실습기 계정 세팅, 학생용·교사용 라이선스 맵핑, 그리고 단말–계정 연결 확인입니다."},
+{os:"Windows", q:"학기 중 인터넷 연결 불안정·네트워크 초기화 민원에 대비해 디벗 담당자가 미리 준비해야 하는 비상 도구는?",
+ opts:["예비 공유기","통합설정 USB","외장 하드디스크","휴대용 프린터"],
+ a:1, exp:"오프라인 상태에서도 기기 환경과 네트워크를 재설정할 수 있는 '통합설정 USB'를 미리 준비해 두어야 합니다."}
+];
+
+const OS_LIST = ["Android","Whale","Chrome","iPad","Windows"];
+const OS_LABEL = {Android:"안드로이드 OS", Whale:"웨일 OS", Chrome:"크롬 OS", iPad:"아이패드 OS", Windows:"윈도우 OS"};
+const OS_TIP = {
+  Android:"Argos MDM/AMA 콘솔 조작(조직 관리·분실 등록·초기화 구분)과 학내망/eVPN 전제 조건을 다시 정리하세요.",
+  Whale:"웨일스페이스 Admin 정책 상속 구조와 WBC 수업관리, 기기 네트워크 경로를 콘솔에서 직접 클릭하며 복습하세요.",
+  Chrome:"CEU 라이선스 성격, OU·그룹 우선순위, chrome://policy 검증 절차를 실습 시나리오로 준비하세요.",
+  iPad:"ASM–MDM–ADE 연결 고리(토큰·프로필·명령 차이)를 도식으로 설명할 수 있도록 정리하세요.",
+  Windows:"테넌트·A3 라이선스 구분과 연간 스테이지(ClassSync·통합설정 USB) 흐름을 타임라인으로 정리하세요."
+};
+
+/* ============ 상태 ============ */
+let order = [], idx = 0, answers = [], startAt = 0, timerId = null, shuffle = false;
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+
+/* ============ 인트로 ============ */
+function renderCover(){
+  $("#coverBars").innerHTML = OS_LIST.map(os=>`
+    <div style="margin-bottom:11px">
+      <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px">
+        <span>${OS_LABEL[os]}</span><span class="sub">10문항 · 20%</span></div>
+      <div class="bar"><i style="width:100%"></i></div>
+    </div>`).join("");
+}
+function loadHistory(){ try{ return JSON.parse(localStorage.getItem("dibut_quiz_hist")||"[]"); }catch(e){ return []; } }
+function saveHistory(rec){ const h=loadHistory(); h.push(rec); localStorage.setItem("dibut_quiz_hist", JSON.stringify(h.slice(-10))); }
+function showLast(){
+  const h = loadHistory(); if(!h.length) return;
+  const last = h[h.length-1];
+  $("#lastCard").style.display="block";
+  $("#lastBody").innerHTML = `<div style="display:flex;gap:26px;flex-wrap:wrap;align-items:center">
+    <div><div class="kpi" style="font-size:24px">${last.score}<small>/ 50</small></div><div class="sub">직전 점수</div></div>
+    <div><div class="kpi" style="font-size:24px">${last.acc}<small>%</small></div><div class="sub">직전 정답률</div></div>
+    <div><div class="kpi" style="font-size:24px">${last.grade}</div><div class="sub">직전 등급</div></div>
+    <div><div class="kpi" style="font-size:24px">${h.length}<small>회</small></div><div class="sub">누적 응시</div></div>
+    <div class="sub">${last.date}</div></div>`;
+}
+
+/* ============ 진행 ============ */
+function buildOrder(subset){
+  let base = subset && subset.length ? subset.slice() : BANK.map((_,i)=>i);
+  if(shuffle){ for(let i=base.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [base[i],base[j]]=[base[j],base[i]]; } }
+  order = base; answers = new Array(order.length).fill(null); idx = 0;
+}
+function start(subset){
+  buildOrder(subset);
+  $("#scr-intro").classList.add("hidden"); $("#scr-result").classList.add("hidden");
+  $("#scr-quiz").classList.remove("hidden");
+  $("#tab1").classList.remove("active"); $("#tab3").classList.remove("active"); $("#tab2").classList.add("active");
+  $("#stateChip").textContent = "In progress";
+  startAt = Date.now(); clearInterval(timerId); timerId = setInterval(tick,1000);
+  buildDots(); renderQ(); window.scrollTo(0,0);
+}
+function tick(){
+  const s = Math.floor((Date.now()-startAt)/1000);
+  $("#elapsed").textContent = fmt(s);
+  const done = answers.filter(a=>a!==null).length;
+  $("#avgSec").textContent = done? Math.round(s/done) : 0;
+}
+function fmt(s){ const m=Math.floor(s/60), r=s%60; return String(m).padStart(2,"0")+":"+String(r).padStart(2,"0"); }
+
+function buildDots(){
+  $("#dotMap").innerHTML = order.map((_,i)=>`<span class="dot" data-i="${i}"></span>`).join("");
+}
+function paintDots(){
+  $$("#dotMap .dot").forEach((d,i)=>{
+    d.className = "dot" + (answers[i]===null? "" : (answers[i].ok? " ok":" no")) + (i===idx? " cur":"");
+  });
+}
+function renderTrackMini(){
+  $("#trackMini").innerHTML = OS_LIST.map(os=>{
+    const ids = order.map((qi,i)=>({qi,i})).filter(o=>BANK[o.qi].os===os);
+    const done = ids.filter(o=>answers[o.i]!==null).length;
+    const ok = ids.filter(o=>answers[o.i] && answers[o.i].ok).length;
+    const pct = ids.length? Math.round(done/ids.length*100):0;
+    return `<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:11.5px;color:#9fb4dc">
+      <span>${OS_LABEL[os]}</span><span>${ok}/${ids.length}</span></div>
+      <div class="bar" style="height:6px;margin-top:4px"><i style="width:${pct}%"></i></div></div>`;
+  }).join("");
+}
+function renderQ(){
+  const qi = order[idx], Q = BANK[qi], rec = answers[idx];
+  $("#qOs").textContent = OS_LABEL[Q.os];
+  $("#qNo").textContent = idx+1;
+  $("#qNow").textContent = idx+1;
+  $("#navQ").textContent = order.length;
+  $("#qText").textContent = Q.q;
+  $("#curOs").textContent = OS_LABEL[Q.os];
+  const sameOs = order.filter(x=>BANK[x].os===Q.os).length;
+  const posOs = order.slice(0,idx+1).filter(x=>BANK[x].os===Q.os).length;
+  $("#curOsProg").textContent = `트랙 내 ${posOs} / ${sameOs}`;
+  $("#progBar").style.width = ((idx+1)/order.length*100)+"%";
+  document.querySelector("#qNow").nextElementSibling.textContent = "/ "+order.length;
+
+  $("#optWrap").innerHTML = Q.opts.map((o,i)=>
+    `<button class="opt" data-i="${i}"><span class="num">${i+1}</span><span>${o}</span></button>`).join("");
+  $("#fbWrap").innerHTML = "";
+  $("#btnNext").disabled = true;
+  $("#btnNext").textContent = (idx===order.length-1) ? "결과 보기 →" : "다음 →";
+  $("#btnPrev").disabled = (idx===0);
+
+  $$("#optWrap .opt").forEach(b=> b.addEventListener("click", ()=> pick(parseInt(b.dataset.i))));
+  if(rec) lock(rec.pick);
+  paintDots(); renderTrackMini(); updateScoreCards();
+}
+function pick(i){
+  if(answers[idx]) return;
+  const qi = order[idx], Q = BANK[qi];
+  answers[idx] = {qi, pick:i, ok:(i===Q.a)};
+  lock(i); paintDots(); renderTrackMini(); updateScoreCards();
+}
+function lock(pickIdx){
+  const Q = BANK[order[idx]];
+  $$("#optWrap .opt").forEach((b,i)=>{
+    b.classList.add("locked");
+    if(i===Q.a) b.classList.add("correct");
+    else if(i===pickIdx) b.classList.add("wrong");
+  });
+  const ok = pickIdx===Q.a;
+  $("#fbWrap").innerHTML = `<div class="feedback">
+    <span class="verdict ${ok?'v-ok':'v-no'}">${ok?'정답입니다':'오답입니다 · 정답 '+(Q.a+1)+'번'}</span>
+    <b>해설</b> ${Q.exp}</div>`;
+  $("#btnNext").disabled = false;
+}
+function updateScoreCards(){
+  const done = answers.filter(a=>a!==null);
+  const ok = done.filter(a=>a.ok).length;
+  $("#okCnt").textContent = ok; $("#noCnt").textContent = done.length-ok;
+  $("#curAcc").textContent = done.length? Math.round(ok/done.length*100):0;
+}
+function next(){
+  if(idx < order.length-1){ idx++; renderQ(); window.scrollTo(0,0); }
+  else finish();
+}
+function prev(){ if(idx>0){ idx--; renderQ(); window.scrollTo(0,0);} }
+
+/* ============ 결과 ============ */
+function gradeOf(acc){
+  if(acc>=90) return {name:"Lead Technician", cls:"b-ok", desc:"전 OS 트랙을 단독으로 강의하고 다른 강사를 코칭할 수 있는 수준입니다. 실습 시연과 돌발 상황 대응 시나리오 준비에 집중하세요."};
+  if(acc>=80) return {name:"Senior Technician", cls:"b-ok", desc:"단독 강의가 가능한 수준입니다. 보완 트랙 문항의 해설을 다시 확인하고 해당 콘솔 화면을 직접 조작해 보완하세요."};
+  if(acc>=60) return {name:"Associate Technician", cls:"b-mid", desc:"보조 강사 또는 사전 보완 후 투입이 권장됩니다. 60% 미만 트랙은 원자료를 다시 학습한 뒤 재진단하세요."};
+  return {name:"Foundation", cls:"b-no", desc:"핵심 관리 도구 개념이 아직 정착되지 않았습니다. OS별 원자료 정독 후 트랙 단위로 나누어 재진단하는 것을 권장합니다."};
+}
+function donut(pct, size, stroke, color){
+  const r = (size-stroke)/2, c = 2*Math.PI*r, off = c*(1-pct/100);
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" role="img" aria-label="정답률 ${pct}%">
+    <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="${stroke}"></circle>
+    <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="${color}" stroke-width="${stroke}"
+      stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${off}"
+      transform="rotate(-90 ${size/2} ${size/2})"></circle>
+    <text x="50%" y="52%" text-anchor="middle" dominant-baseline="middle" fill="#fff" font-size="${size*0.24}" font-weight="800">${pct}%</text>
+  </svg>`;
+}
+function radar(vals){
+  const size=250, cx=size/2, cy=size/2+6, R=88, n=5;
+  const pt=(i,v)=>{ const a=-Math.PI/2 + i*2*Math.PI/n; const r=R*v/100; return [cx+r*Math.cos(a), cy+r*Math.sin(a)]; };
+  let rings="";
+  [25,50,75,100].forEach(g=>{
+    const p=[...Array(n)].map((_,i)=>pt(i,g).join(",")).join(" ");
+    rings+=`<polygon points="${p}" fill="none" stroke="#22304f" stroke-width="1"></polygon>`;
+  });
+  const base=[...Array(n)].map((_,i)=>pt(i,80).join(",")).join(" ");
+  const poly=[...Array(n)].map((_,i)=>pt(i,vals[i]).join(",")).join(" ");
+  let axes="",labels="";
+  for(let i=0;i<n;i++){
+    const [x,y]=pt(i,100); axes+=`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#22304f"></line>`;
+    const [lx,ly]=pt(i,122);
+    labels+=`<text x="${lx}" y="${ly}" fill="#9fb4dc" font-size="11" text-anchor="middle" dominant-baseline="middle">${OS_LABEL[OS_LIST[i]].replace(' OS','')}</text>`;
+    labels+=`<text x="${lx}" y="${ly+13}" fill="#e8eefc" font-size="11" font-weight="700" text-anchor="middle">${vals[i]}%</text>`;
+  }
+  const dots=[...Array(n)].map((_,i)=>{const [x,y]=pt(i,vals[i]);return `<circle cx="${x}" cy="${y}" r="3.5" fill="#31d3f2"></circle>`;}).join("");
+  return `<svg width="100%" height="270" viewBox="0 0 ${size} ${size+20}" role="img" aria-label="OS별 정답률 레이더">
+    ${rings}${axes}
+    <polygon points="${base}" fill="none" stroke="#3b4a6b" stroke-width="1.5" stroke-dasharray="4 3"></polygon>
+    <polygon points="${poly}" fill="rgba(47,107,255,.35)" stroke="#2f6bff" stroke-width="2"></polygon>
+    ${dots}${labels}</svg>`;
+}
+function colorFor(p){ return p>=80? "#22c55e" : (p>=60? "#f5b301":"#f2542d"); }
+
+function finish(){
+  clearInterval(timerId);
+  const secs = Math.floor((Date.now()-startAt)/1000);
+  const total = order.length;
+  const score = answers.filter(a=>a&&a.ok).length;
+  const acc = Math.round(score/total*100);
+  const g = gradeOf(acc);
+
+  $("#scr-quiz").classList.add("hidden"); $("#scr-result").classList.remove("hidden");
+  $("#tab2").classList.remove("active"); $("#tab3").classList.add("active");
+  $("#stateChip").textContent = "Completed";
+
+  $("#donutTotal").innerHTML = donut(acc,110,12,"#ffffff");
+  $("#gradeName").textContent = g.name;
+  $("#gradeSub").textContent = OS_LIST.length+" tracks";
+  $("#scoreTxt").textContent = score+" / "+total;
+  $("#timeTxt").textContent = fmt(secs);
+  $("#gradeDesc").textContent = g.desc;
+  $("#rAcc").textContent = acc; $("#rAccBar").style.width = acc+"%";
+
+  const stat = {};
+  OS_LIST.forEach(os=>{
+    const ids = answers.map((a,i)=>({a,i})).filter(o=>o.a && BANK[o.a.qi].os===os);
+    const tot = ids.length, ok = ids.filter(o=>o.a.ok).length;
+    stat[os] = {tot, ok, pct: tot? Math.round(ok/tot*100):0};
+  });
+  const present = OS_LIST.filter(os=>stat[os].tot>0);
+  const sorted = present.slice().sort((a,b)=>stat[b].pct-stat[a].pct);
+  $("#bestOs").textContent = sorted.length? OS_LABEL[sorted[0]].replace(" OS",""):"-";
+  $("#bestVal").textContent = sorted.length? stat[sorted[0]].pct+"% ("+stat[sorted[0]].ok+"/"+stat[sorted[0]].tot+")":"-";
+  const worst = sorted[sorted.length-1];
+  $("#worstOs").textContent = worst? OS_LABEL[worst].replace(" OS",""):"-";
+  $("#worstVal").textContent = worst? stat[worst].pct+"% ("+stat[worst].ok+"/"+stat[worst].tot+")":"-";
+  $("#readyOs").textContent = present.filter(os=>stat[os].pct>=80).length;
+
+  $("#radarWrap").innerHTML = radar(OS_LIST.map(os=>stat[os].pct)) +
+    `<div class="sr-only"><table><caption>OS별 정답률</caption><tr><th>OS</th><th>정답률</th></tr>
+     ${OS_LIST.map(os=>`<tr><td>${OS_LABEL[os]}</td><td>${stat[os].pct}%</td></tr>`).join("")}</table></div>`;
+
+  $("#osBars").innerHTML = OS_LIST.map(os=>{
+    const s=stat[os], c=colorFor(s.pct);
+    return `<div style="margin-bottom:13px">
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px">
+        <span>${OS_LABEL[os]}</span>
+        <span><b style="color:${c}">${s.pct}%</b> <span class="sub">${s.ok}/${s.tot}</span></span></div>
+      <div class="bar"><i style="width:${s.pct}%;background:${c}"></i></div></div>`;
+  }).join("") + `<div class="sr-only"><table><tr><th>OS</th><th>정답</th><th>정답률</th></tr>
+    ${OS_LIST.map(os=>`<tr><td>${OS_LABEL[os]}</td><td>${stat[os].ok}/${stat[os].tot}</td><td>${stat[os].pct}%</td></tr>`).join("")}</table></div>`;
+
+  $("#heat").innerHTML = OS_LIST.map(os=>{
+    const cells = answers.map((a,i)=>({a,i})).filter(o=>o.a && BANK[o.a.qi].os===os)
+      .map(o=>`<span class="dot ${o.a.ok?'ok':'no'}" title="Q${o.i+1}" style="width:18px;height:18px;border-radius:4px"></span>`).join("");
+    if(!cells) return "";
+    return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+      <span class="sub" style="width:100px;flex:0 0 100px">${OS_LABEL[os]}</span>
+      <span class="dots">${cells}</span></div>`;
+  }).join("") + `<div class="legend"><span><i style="background:#22c55e"></i>정답</span><span><i style="background:#f2542d"></i>오답</span></div>`;
+
+  const rec = {date:new Date().toLocaleString("ko-KR"), score, total, acc, grade:g.name,
+               os:Object.fromEntries(OS_LIST.map(os=>[os,stat[os].pct]))};
+  saveHistory(rec);
+  const hist = loadHistory();
+  $("#history").innerHTML = hist.slice().reverse().map((h,i)=>`
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px">
+      <span class="sub" style="width:120px;flex:0 0 120px;font-size:11px">${h.date}</span>
+      <span class="bar" style="flex:1"><i style="width:${h.acc}%;background:${i===0?'linear-gradient(90deg,#2f6bff,#31d3f2)':'#3b4a6b'}"></i></span>
+      <b style="width:52px;text-align:right;font-size:12.5px">${h.acc}%</b>
+      <span class="badge ${gradeOf(h.acc).cls}" style="font-size:10px">${h.grade.split(" ")[0]}</span>
+    </div>`).join("") + `<div class="sub" style="margin-top:6px">최근 최대 10회 기록이 이 브라우저에 저장됩니다.</div>`;
+
+  const tb = $("#diagTable tbody");
+  tb.innerHTML = OS_LIST.map(os=>{
+    const s=stat[os];
+    const st = s.tot===0? `<span class="badge b-mid">미응시</span>`
+      : (s.pct>=80? `<span class="badge b-ok">강의 가능</span>` : s.pct>=60? `<span class="badge b-mid">보완 필요</span>` : `<span class="badge b-no">재학습</span>`);
+    const cmt = s.tot===0? "이번 진단에 포함되지 않은 트랙입니다."
+      : (s.pct>=80? "핵심 개념이 안정적으로 정착되어 있습니다. 실습 시연·질의응답 대비에 집중하세요." : OS_TIP[os]);
+    return `<tr><td>${OS_LABEL[os]}</td><td class="num">${s.ok}/${s.tot}</td><td class="num">${s.pct}%</td><td>${st}</td><td class="sub">${cmt}</td></tr>`;
+  }).join("");
+
+  const wrongs = answers.map((a,i)=>({a,i})).filter(o=>o.a && !o.a.ok);
+  $("#wrongCount").textContent = wrongs.length+"건";
+  $("#wrongFilter").innerHTML = [`<button class="fbtn on" data-f="ALL">전체 ${wrongs.length}</button>`]
+    .concat(OS_LIST.map(os=>{
+      const c = wrongs.filter(o=>BANK[o.a.qi].os===os).length;
+      return `<button class="fbtn" data-f="${os}">${OS_LABEL[os].replace(" OS","")} ${c}</button>`;
+    })).join("");
+  renderWrong("ALL", wrongs);
+  $$("#wrongFilter .fbtn").forEach(b=>b.addEventListener("click",()=>{
+    $$("#wrongFilter .fbtn").forEach(x=>x.classList.remove("on")); b.classList.add("on");
+    renderWrong(b.dataset.f, wrongs);
+  }));
+
+  window.__result = {rec, wrongs: wrongs.map(o=>({no:o.i+1, os:BANK[o.a.qi].os, q:BANK[o.a.qi].q}))};
+  window.scrollTo(0,0);
+}
+function renderWrong(f, wrongs){
+  const list = f==="ALL"? wrongs : wrongs.filter(o=>BANK[o.a.qi].os===f);
+  if(!list.length){ $("#wrongList").innerHTML = `<div class="sub">해당 조건의 오답이 없습니다. 좋은 결과입니다.</div>`; return; }
+  $("#wrongList").innerHTML = list.map(o=>{
+    const Q = BANK[o.a.qi];
+    return `<div class="wrongitem">
+      <span class="ostag">${OS_LABEL[Q.os]}</span> <span class="sub">Q${o.i+1}</span>
+      <div class="q">${Q.q}</div>
+      <div class="line">내 선택 · <b style="color:#ff8a6b">${Q.opts[o.a.pick]}</b></div>
+      <div class="line">정답 · <b style="color:#4ade80">${Q.opts[Q.a]}</b></div>
+      <div class="line" style="margin-top:7px"><b>해설</b> ${Q.exp}</div>
+    </div>`;
+  }).join("");
+}
+
+/* ============ 이벤트 ============ */
+$("#btnStart").addEventListener("click", ()=>start(null));
+$("#btnNext").addEventListener("click", next);
+$("#btnPrev").addEventListener("click", prev);
+$("#btnShuffle").addEventListener("click", e=>{ shuffle=!shuffle; e.target.textContent = "문항 순서 섞기: "+(shuffle?"ON":"OFF"); });
+$("#btnRetry").addEventListener("click", ()=>{ start(null); });
+$("#btnRetryWrong").addEventListener("click", ()=>{
+  const w = answers.filter(a=>a&&!a.ok).map(a=>a.qi);
+  if(!w.length){ alert("오답이 없습니다."); return; }
+  start(w);
+});
+$("#btnCopy").addEventListener("click", ()=>{
+  const r = window.__result.rec;
+  const txt = `[디벗 테크니션 역량 진단]\n일시 ${r.date}\n점수 ${r.score}/${r.total} (${r.acc}%) · 등급 ${r.grade}\n`
+    + OS_LIST.map(os=>`- ${OS_LABEL[os]}: ${r.os[os]}%`).join("\n");
+  navigator.clipboard.writeText(txt).then(()=>alert("결과 요약이 복사되었습니다."),()=>alert("복사에 실패했습니다."));
+});
+$("#btnJson").addEventListener("click", ()=>{
+  const blob = new Blob([JSON.stringify(window.__result,null,2)],{type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = "dibut_technician_result.json"; a.click();
+});
+document.addEventListener("keydown", e=>{
+  if($("#scr-quiz").classList.contains("hidden")) return;
+  if(["1","2","3","4"].includes(e.key)) pick(parseInt(e.key)-1);
+  if(e.key==="Enter" && !$("#btnNext").disabled) next();
+  if(e.key==="ArrowLeft") prev();
+});
+function clock(){ const d=new Date(); $("#clock").textContent = String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"); }
+clock(); setInterval(clock,20000);
+renderCover(); showLast();
+</script>
+</body>
+</html>
